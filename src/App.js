@@ -4,19 +4,19 @@ import "bootstrap/dist/css/bootstrap.css";
 import { Navbar, NavItem, Nav, Container, Row, Col } from "react-bootstrap";
 
 const PLACES = [{
-    name: "Ulyanovsk",
+    name: "Ульяновск",
     zip: "432000"
   },
   {
-    name: "Dimitrovgrad",
-    zip: "433502"
+    name: "Димитровград",
+    zip: "433500"
   },
   {
-    name: "Novoulyanovsk",
+    name: "Новоульяновск",
     zip: "433300"
   },
   {
-    name: "Undory",
+    name: "Ундоры",
     zip: "433340"
   }
 ];
@@ -29,9 +29,7 @@ class WeatherDisplay extends React.Component {
   }
   componentDidMount() {
     const zip = this.props.zip;
-    const URL = "http://api.openweathermap.org/data/2.5/weather?q=" +
-      zip +
-      ",ru&appid=a16966a3c44261ccd0ddc5da1be8b926";
+    const URL = "http://api.openweathermap.org/data/2.5/weather?zip=" + zip + ",ru&appid=a16966a3c44261ccd0ddc5da1be8b926&lang=ru&units=metric";
     fetch(URL).then(res => res.json()).then(json => {
       this.setState({ weatherData: json });
     });
@@ -44,13 +42,13 @@ class WeatherDisplay extends React.Component {
     return (
       <div>
         <h1>
-          {weather.main} in {weatherData.name}
+          {weather.description} в {weatherData.name}
           <img src={iconUrl} alt={weatherData.description} />
         </h1>
-        <p>Current: {weatherData.main.temp}°</p>
-        <p>High: {weatherData.main.temp_max}°</p>
-        <p>Low: {weatherData.main.temp_min}°</p>
-        <p>Wind Speed: {weatherData.wind.speed} mi/hr</p>
+        <p>Текущая t°: {weatherData.main.temp}°C</p>
+        <p>Максимальная t°: {weatherData.main.temp_max}°C</p>
+        <p>Минимальная t°: {weatherData.main.temp_min}°C</p>
+        <p>Скорость ветра: {weatherData.wind.speed} м/с</p>
       </div>
     );
   }
@@ -66,25 +64,34 @@ class App extends React.Component {
   render() {
     const activePlace = this.state.activePlace;
     return (
-      <div className="App">
+      <div>
         <Navbar>
               React Simple Weather App
         </Navbar>
-        <Container-fluid>
+        <Container>
           <Row>
               <Col md={4} sm={4}>
-                <h3>Select a city</h3>
+                <h3>Выбери город</h3>
+                <Nav bsStyle="pills" stacked activeKey={activePlace} onSelect={index => {
+                  this.setState({ activePlace: index });
+                }}
+                >
                 {PLACES.map((place, index) => (
                   <button key={index} onClick={() => {
                     this.setState({ activePlace: index });
-                  }}>{place.name}</button>
+                  }}
+                  >
+                  {place.name}
+                  </button>
                 ))}
+                </Nav>
               </Col>
+
               <Col md={8} sm={8}>
               <WeatherDisplay key={activePlace} zip={PLACES[activePlace].zip} />
               </Col>
           </Row>
-        </Container-fluid>
+        </Container>
       </div>
     );
   }
