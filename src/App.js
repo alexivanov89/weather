@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {Component} from 'react';
 import './App.css';
-import "bootstrap/dist/css/bootstrap.css";
-import { Navbar, NavItem, Nav, Container, Row, Col } from "react-bootstrap";
+import 'bootstrap/dist/css/bootstrap.css';
+import { Navbar, NavItem, Nav, Container, Row, Col } from 'react-bootstrap';
 
 const PLACES = [{
     name: "Ульяновск",
@@ -20,7 +20,7 @@ const PLACES = [{
     zip: "433340"
   }
 ];
-class WeatherDisplay extends React.Component {
+class WeatherDisplay extends Component {
   constructor() {
     super();
     this.state = {
@@ -54,11 +54,11 @@ class WeatherDisplay extends React.Component {
   }
 }
 
-class App extends React.Component {
+class App extends Component {
   constructor() {
     super();
     this.state = {
-      activePlace: 0,
+      activePlace: 0
     };
   }
   render() {
@@ -72,23 +72,29 @@ class App extends React.Component {
           <Row>
               <Col md={4} sm={4}>
                 <h3>Выбери город</h3>
-                <Nav bsStyle="pills" stacked activeKey={activePlace} onSelect={index => {
-                  this.setState({ activePlace: index });
-                }}
-                >
-                {PLACES.map((place, index) => (
-                  <button key={index} onClick={() => {
+                <Nav
+                  bsStyle="pills"
+                  stacked
+                  activeKey={activePlace}
+                  onSelect={index => {
                     this.setState({ activePlace: index });
                   }}
                   >
-                  {place.name}
-                  </button>
-                ))}
+                  {PLACES.map((place, index) => (
+                    /* <NavItem key={index} eventKey={index}>{place.name}</NavItem> */
+                    <button
+                      key={index}
+                      onClick={() => {
+                        this.setState({ activePlace: index });
+                      }}
+                      >
+                      {place.name}
+                      </button>
+                      ))}
                 </Nav>
               </Col>
-
               <Col md={8} sm={8}>
-              <WeatherDisplay key={activePlace} zip={PLACES[activePlace].zip} />
+                <WeatherDisplay key={activePlace} zip={PLACES[activePlace].zip} />
               </Col>
           </Row>
         </Container>
