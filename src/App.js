@@ -1,7 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import 'bootstrap/dist/css/bootstrap.css';
-import { Navbar, NavItem, Nav, Container, Row, Col } from 'react-bootstrap';
+import { Navbar, Nav, Container, Row, Col } from 'react-bootstrap';
 
 const PLACES = [{
     name: "Ульяновск",
@@ -65,31 +64,23 @@ class App extends Component {
     const activePlace = this.state.activePlace;
     return (
       <div>
-        <Navbar>
-              React Simple Weather App
+        <Navbar bg='dark' variant='dark'>
+              <Navbar.Brand>React Simple Weather App</Navbar.Brand>
         </Navbar>
+        <br />
         <Container>
           <Row>
               <Col md={4} sm={4}>
-                <h3>Выбери город</h3>
-                <Nav
-                  bsStyle="pills"
+                <h5>Выберите населенный пункт</h5>
+                <Nav className='flex-column'
+                  variant='pills'
                   stacked
-                  activeKey={activePlace}
+                  ActiveKey={activePlace}
                   onSelect={index => {
                     this.setState({ activePlace: index });
-                  }}
-                  >
+                  }}>
                   {PLACES.map((place, index) => (
-                    /* <NavItem key={index} eventKey={index}>{place.name}</NavItem> */
-                    <button
-                      key={index}
-                      onClick={() => {
-                        this.setState({ activePlace: index });
-                      }}
-                      >
-                      {place.name}
-                      </button>
+                    <Nav.Item > <Nav.Link eventKey={index}>{place.name}</Nav.Link></Nav.Item>
                       ))}
                 </Nav>
               </Col>
