@@ -1,97 +1,103 @@
-import React, {Component} from 'react';
-import './App.css';
-import { Navbar, Nav, Container, Row, Col } from 'react-bootstrap';
+import React from "react";
+import { useState } from "react";
+import Header from "./components/Header/Header";
+import "./App.css";
 
-const PLACES = [{
-    name: "Ульяновск",
-    zip: "432000"
-  },
-  {
-    name: "Димитровград",
-    zip: "433500"
-  },
-  {
-    name: "Новоульяновск",
-    zip: "433300"
-  },
-  {
-    name: "Ундоры",
-    zip: "433340"
-  }
-];
-class WeatherDisplay extends Component {
-  constructor() {
-    super();
-    this.state = {
-      weatherData: null
-    };
-  }
-  componentDidMount() {
-    const zip = this.props.zip;
-    const URL = "http://api.openweathermap.org/data/2.5/weather?zip=" + zip + ",ru&appid=a16966a3c44261ccd0ddc5da1be8b926&lang=ru&units=metric";
-    fetch(URL).then(res => res.json()).then(json => {
-      this.setState({ weatherData: json });
-    });
-  }
-  render() {
-    const weatherData = this.state.weatherData;
-    if (!weatherData) return <div>Loading</div>;
-    const weather = weatherData.weather[0];
-    const iconUrl = "http://openweathermap.org/img/w/" + weather.icon + ".png";
-    return (
-      <div>
-        <h1>
-          {weather.description} в {weatherData.name}
-          <img src={iconUrl} alt={weatherData.description} />
-        </h1>
-        <p>Текущая t°: {weatherData.main.temp}°C</p>
-        <p>Максимальная t°: {weatherData.main.temp_max}°C</p>
-        <p>Минимальная t°: {weatherData.main.temp_min}°C</p>
-        <p>Скорость ветра: {weatherData.wind.speed} м/с</p>
-      </div>
-    );
-  }
-}
+const api = {
+    key: "a16966a3c44261ccd0ddc5da1be8b926",
+    base: "http://api.openweathermap.org/data/2.5/",
+};
 
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
-      activePlace: 0
+const dateBuilder = (d) => {
+    let months = [
+        "Января",
+        "Февраля",
+        "Марта",
+        "Апреля",
+        "Мая",
+        "Июня",
+        "Июля",
+        "Августа",
+        "Сентября",
+        "Октября",
+        "Ноября",
+        "Декабря",
+    ];
+    let days = ["Воскресенье", "Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"];
+
+    let day = days[d.getDay()];
+    let date = d.getDate();
+    let month = months[d.getMonth()];
+    let year = d.getFullYear();
+
+    return `${day} ${date} ${month} ${year} `;
+};
+
+function App() {
+    const [query, setQuery] = useState("");
+    const [weather, setWeather] = useState({});
+
+    const search = (evt) => {
+        if (evt.key === "Enter") {
+            fetch(`${api.base}weather?q=${query}&lang=ru&units=metric&APPID=${api.key}`)
+                .then((res) => res.json())
+                .then((result) => {
+                    setWeather(result);
+                    setQuery("");
+                    console.log(result);
+                });
+        }
     };
-  }
-  render() {
-    const activePlace = this.state.activePlace;
+
     return (
-      <div>
-        <Navbar bg='dark' variant='dark'>
-              <Navbar.Brand>React Simple Weather App</Navbar.Brand>
-        </Navbar>
-        <br />
-        <Container>
-          <Row>
-              <Col md={4} sm={4}>
-                <h5>Выберите населенный пункт</h5>
-                <Nav className='flex-column'
-                  variant='pills'
-                  stacked
-                  ActiveKey={activePlace}
-                  onSelect={index => {
-                    this.setState({ activePlace: index });
-                  }}>
-                  {PLACES.map((place, index) => (
-                    <Nav.Item > <Nav.Link eventKey={index}>{place.name}</Nav.Link></Nav.Item>
-                      ))}
-                </Nav>
-              </Col>
-              <Col md={8} sm={8}>
-                <WeatherDisplay key={activePlace} zip={PLACES[activePlace].zip} />
-              </Col>
-          </Row>
-        </Container>
-      </div>
+        <div className={typeof weather.main != "undefined" ? (weather.main.temp > 8 ? "app warm" : "app") : "app"}>
+            <main>
+                <Header />
+
+                <div className="search-box">
+                    <input
+                        type="search"
+                        className="search-bar"
+                        placeholder="Введите город..."
+                        onChange={(e) => setQuery(e.target.value)}
+                        value={query}
+                        onKeyPress={search}
+                    />
+                </div>
+
+                <div className="date">{dateBuilder(new Date())}</div>
+
+                {typeof weather.main != "undefined" ? (
+                    <div>
+                        <div className="location-box">
+                            <div className="location">
+                                {weather.name}, {weather.sys.country}
+                            </div>
+                        </div>
+
+                        <div className="weather-box">
+                            <div className="temp">{Math.round(weather.main.temp)}℃</div>
+
+                            <div className="descr">
+                                <div className="weather">{weather.weather[0].description} </div>
+                                <div className="weather-icon">
+                                    <img
+                                        className="icon-temp"
+                                        src={`http://openweathermap.org/img/w/${weather.weather[0].icon}.png`}
+                                        alt="icon-weather"
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="wind">Скорость ветра: {weather.wind.speed} м/с</div>
+                        </div>
+                    </div>
+                ) : (
+                    ""
+                )}
+            </main>
+        </div>
     );
-  }
 }
 
 export default App;
